@@ -44,7 +44,7 @@ const Navbar = () => {
   const navItems: { name: string; href: string; icon?: React.ElementType }[] = [
     { name: 'Dashboard', href: '/', icon: undefined },
     { name: 'Files', href: '#', icon: undefined },
-    { name: 'Security', href: '#', icon: Lock },
+    { name: 'Security', href: '/security', icon: Lock },
     { name: 'Settings', href: '#', icon: Settings },
   ];
 
@@ -113,7 +113,7 @@ const Navbar = () => {
                 )}
                 {/* Dropdown */}
                 {profileOpen && user && (
-                  <div className="absolute right-16 top-14 mt-2 w-36 bg-white border border-gray-200 px-2 shadow-lg z-50 flex flex-col items-start">
+                  <div className="absolute right-12 top-14 mt-2 w-36 bg-white border border-gray-200 px-2 shadow-lg z-50 flex flex-col items-start">
                     <span className="text-lg text-gray-500 mb-2 border-b py-2 w-full">Profile</span>
                     <div className="py-2">
                       <LogoutButton />

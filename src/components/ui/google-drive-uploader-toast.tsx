@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
@@ -11,6 +12,8 @@ import {
   File,
   XCircle,
 } from "lucide-react";
+
+import { createClient } from '@/lib/client';
 
 const CheckCircle = () => {
   return (
@@ -388,9 +391,45 @@ export const Component = () => {
           updateItem(id, { progress: percent });
         }
       };
-      xhr.onload = () => {
+      xhr.onload = async () => {
         if (xhr.status === 200) {
           updateItem(id, { status: "SUCCESS", progress: 100 });
+          // Save file URL to Supabase myfiles table
+          try {
+            const response = JSON.parse(xhr.responseText);
+            const fileUrl = response.secure_url;
+            const supabase = createClient();
+            const { data: userData, error: userError } = await supabase.auth.getUser();
+            if (userError || !userData?.user?.id) {
+              throw new Error('User not authenticated');
+            }
+            const userId = userData.user.id;
+            // Fetch existing files
+            const { data: existing, error: fetchError } = await supabase
+              .from('myfiles')
+              .select('files')
+              .eq('user_id', userId)
+              .single();
+            let filesArr = [];
+            if (existing && existing.files) {
+              filesArr = existing.files;
+            }
+            filesArr.push({
+              url: fileUrl,
+              name: file.name,
+              uploaded_at: new Date().toISOString(),
+            });
+            // Upsert the files array
+            const { error: upsertError } = await supabase
+              .from('myfiles')
+              .upsert([{ user_id: userId, files: filesArr, secured: false }], { onConflict: 'user_id' });
+            if (upsertError) {
+              throw new Error(upsertError.message);
+            }
+          } catch (err) {
+            // Optionally show error to user
+            // console.error('Failed to save file info:', err);
+          }
         } else {
           updateItem(id, { status: "ERROR", error: "Upload failed. Try again.", progress: 100 });
         }
@@ -399,7 +438,6 @@ export const Component = () => {
         updateItem(id, { status: "ERROR", error: "An error occurred during upload.", progress: 100 });
       };
       xhr.send(formData);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       updateItem(id, { status: "ERROR", error: "Something went wrong.", progress: 100 });
     }
