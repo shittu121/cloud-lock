@@ -5,8 +5,8 @@ import { createClient } from '@/lib/server';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow /auth/* and /security without checks
-  if (pathname.startsWith('/auth') || pathname.startsWith('/security')) {
+  // Allow /auth/* without checks
+  if (pathname.startsWith('/auth')) {
     return NextResponse.next();
   }
 
@@ -17,11 +17,16 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    // Not logged in, redirect to /security
-    return NextResponse.redirect(new URL('/security', request.url));
+    // Not logged in, redirect to /auth/login
+    return NextResponse.redirect(new URL('/auth/login', request.url));
   }
 
-  // Check for password row
+  // If accessing /security, allow for authenticated users
+  if (pathname.startsWith('/security')) {
+    return NextResponse.next();
+  }
+
+  // Check for password row for all other routes
   const { data: passwordRows, error } = await supabase
     .from('password')
     .select('password')
@@ -45,5 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!auth|security).*)'],
+  matcher: ['/((?!auth).*)'],
 }; 

@@ -37,29 +37,45 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const { pathname } = request.nextUrl
+
+  // Allow /auth/* and /security without checks
+  if (pathname.startsWith('/auth')) {
+    return supabaseResponse
+  }
+
+  if (!user) {
+    // No user, redirect to login
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
+  // User is logged in, now check for password row
+  const { data: passwordRows, error } = await supabase
+    .from('password')
+    .select('password')
+    .eq('user_id', user.id)
+    .limit(1)
 
+  const passwordRow = passwordRows?.[0]
+
+  if (
+    error ||
+    !passwordRow ||
+    passwordRow.password === null ||
+    passwordRow.password === ''
+  ) {
+    // No password row, or password is empty/null
+    const url = request.nextUrl.clone()
+    url.pathname = '/security'
+    return NextResponse.redirect(url)
+  }
+
+  // All good, user is authenticated and has valid password
   return supabaseResponse
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

@@ -99,8 +99,6 @@ const Navbar = () => {
                 <div
                   className="h-8 w-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300"
                   onClick={() => setProfileOpen((v) => !v)}
-                  tabIndex={0}
-                  onBlur={() => setTimeout(() => setProfileOpen(false), 150)}
                 >
                   <User className="h-4 w-4 text-white" />
                 </div>
@@ -173,8 +171,6 @@ const Navbar = () => {
                 <div
                   className="h-10 w-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center cursor-pointer"
                   onClick={() => setProfileOpen((v) => !v)}
-                  tabIndex={0}
-                  onBlur={() => setTimeout(() => setProfileOpen(false), 150)}
                 >
                   <User className="h-5 w-5 text-white" />
                 </div>
