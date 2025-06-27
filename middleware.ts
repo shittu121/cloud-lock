@@ -50,6 +50,27 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Check if password is set for the user
+  const { data: passwordRows, error } = await supabase
+    .from('password')
+    .select('password')
+    .eq('user_id', user.id)
+    .limit(1);
+
+  const passwordRow = passwordRows?.[0];
+
+  if (
+    error ||
+    !passwordRow ||
+    passwordRow.password === null ||
+    passwordRow.password === ''
+  ) {
+    // No password row, or password is empty/null
+    const url = request.nextUrl.clone();
+    url.pathname = '/security';
+    return NextResponse.redirect(url);
+  }
+
   // All good, allow the request
   return supabaseResponse;
 }
