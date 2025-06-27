@@ -483,10 +483,10 @@ export const Component = () => {
       <div className="max-w-4xl m-auto pt-20">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Secure Cloud File Storage App
+            Secure Cloud File Storage
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
-            Click any file type below to upload to Cloudinary
+            Click any file type below to upload to the Cloud.
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-500">
             Maximum {MAX_UPLOADS} concurrent uploads • {uploadingCount}/{MAX_UPLOADS} active
