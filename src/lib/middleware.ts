@@ -40,7 +40,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Allow /auth/* and /security without checks
-  if (pathname.startsWith('/auth')) {
+  if (pathname.startsWith('/auth') || pathname.startsWith('/security')) {
     return supabaseResponse
   }
 

@@ -1,54 +1,59 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createClient } from '@/lib/server';
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { pathname } = request.nextUrl;
 
-  // Allow /auth/* without checks
-  if (pathname.startsWith('/auth')) {
-    return NextResponse.next();
-  }
-
-  // Create Supabase client (await, no args)
-  const supabase = await createClient();
-
-  // Get the user
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    // Not logged in, redirect to /auth/login
-    return NextResponse.redirect(new URL('/auth/login', request.url));
-  }
-
-  // If accessing /security, allow for authenticated users
-  if (pathname.startsWith('/security')) {
-    return NextResponse.next();
-  }
-
-  // Check for password row for all other routes
-  const { data: passwordRows, error } = await supabase
-    .from('password')
-    .select('password')
-    .eq('user_id', user.id)
-    .limit(1);
-
-  const passwordRow = passwordRows?.[0];
-
+  // Allow /auth/*, /security, /_next, and favicon.ico without checks
   if (
-    error ||
-    !passwordRow ||
-    passwordRow.password === null ||
-    passwordRow.password === ''
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/security') ||
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico'
   ) {
-    // No password row, or password is empty/null
-    return NextResponse.redirect(new URL('/security', request.url));
+    return supabaseResponse;
+  }
+
+  // If not authenticated, redirect to login
+  if (!user) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/auth/login';
+    return NextResponse.redirect(url);
   }
 
   // All good, allow the request
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {
-  matcher: ['/((?!auth|security|_next|favicon.ico).*)'],
+  matcher: ['/((?!_next|favicon.ico).*)'],
 }; 
