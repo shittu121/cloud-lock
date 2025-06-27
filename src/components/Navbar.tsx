@@ -43,7 +43,7 @@ const Navbar = () => {
 
   const navItems: { name: string; href: string; icon?: React.ElementType }[] = [
     { name: 'Dashboard', href: '/', icon: undefined },
-    { name: 'Files', href: '#', icon: undefined },
+    { name: 'My Files', href: '/myfiles', icon: undefined },
     { name: 'Security', href: '/security', icon: Lock },
     { name: 'Settings', href: '#', icon: Settings },
   ];

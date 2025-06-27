@@ -417,6 +417,7 @@ export const Component = () => {
             filesArr.push({
               url: fileUrl,
               name: file.name,
+              file_type: fileType,
               uploaded_at: new Date().toISOString(),
             });
             // Upsert the files array
@@ -461,6 +462,7 @@ export const Component = () => {
     const file = e.target.files?.[0];
     if (file && pendingFileType) {
       handleUpload(file, pendingFileType);
+      setPendingFileType(null); // Reset the pending file type
     }
   };
 
