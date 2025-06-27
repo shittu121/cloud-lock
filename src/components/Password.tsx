@@ -1,9 +1,10 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Lock, Shield, Check, X, AlertCircle, Key, Cloud } from 'lucide-react';
 import { createClient } from '@/lib/client';
 import bcrypt from 'bcryptjs';
-import Link from 'next/link';
+// import Link from 'next/link';
 
 const PasswordSetupUI = () => {
   const [password, setPassword] = useState('');
@@ -338,12 +339,12 @@ const PasswordSetupUI = () => {
                 >
                   Change Password
                 </button>
-                <Link
+                <a
                   href="/"
                   className="flex-1 w-full block py-3 px-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105 text-center"
                 >
                   Continue
-                </Link>
+                </a>
               </div>
             </div>
           )}
