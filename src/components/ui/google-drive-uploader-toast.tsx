@@ -480,7 +480,7 @@ export const Component = () => {
         accept={acceptString}
         onChange={handleFileChange}
       />
-      <div className="max-w-4xl m-auto pt-20">
+      <div className="max-w-4xl m-auto pt-16 md:pt-20">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Secure Cloud File Storage
