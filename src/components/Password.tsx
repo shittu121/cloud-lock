@@ -338,8 +338,13 @@ const PasswordSetupUI = () => {
                 >
                   Change Password
                 </button>
-                <Link href='/'  className="flex-1 py-3 px-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105">
-                  Continue
+                <Link href='/' className="flex-1">
+                  <button
+                    type="button"
+                    className="w-full py-3 px-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105"
+                  >
+                    Continue
+                  </button>
                 </Link>
               </div>
             </div>
